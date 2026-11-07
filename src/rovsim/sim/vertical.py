@@ -129,8 +129,10 @@ def analytic_heave(
     and dz/dt = (w_t**2 / a0) * (a0 / w_t) * tanh(...) = w(t), so the pair closes.
 
     Degenerate cases: F == 0 returns zero arrays (the body never moves); with
-    no drag (w_t infinite) the limit is constant acceleration, w = a0*t and
-    z = 0.5*a0*t**2.
+    no drag (w_t infinite) nothing balances F, so the acceleration never
+    changes and the limit of the formulas above is constant acceleration:
+    w = a0*t and z = 0.5*a0*t**2 (a literal tanh/cosh evaluation would give
+    inf * 0 = NaN).
     """
     t = np.asarray(t, dtype=float)
     force = net_static_force(body)

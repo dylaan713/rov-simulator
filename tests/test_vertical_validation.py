@@ -6,6 +6,7 @@ from rovsim.sim.vertical import (
     VerticalBody,
     analytic_heave,
     derivative,
+    net_static_force,
     terminal_velocity,
 )
 
@@ -92,3 +93,16 @@ def test_neutrally_buoyant_closed_form_is_zero_not_nan():
     z, w = analytic_heave(neutral, np.linspace(0.0, 5.0, 11))
     assert np.all(np.isfinite(z)) and np.all(np.isfinite(w))
     assert np.allclose(z, 0.0) and np.allclose(w, 0.0)
+
+
+def test_zero_drag_gives_constant_acceleration_motion():
+    # With no drag there is nothing to balance the net static force, so the
+    # body never reaches a terminal velocity: w = a0*t and z = a0*t**2/2.
+    dragless = VerticalBody(
+        mass=10.0, volume=8.0e-3, drag_coefficient=0.0, reference_area=0.05
+    )
+    a0 = net_static_force(dragless) / dragless.mass  # 1.96133 m/s**2
+    t = np.array([0.0, 1.0, 2.0, 3.0])
+    z, w = analytic_heave(dragless, t)
+    assert np.allclose(w, a0 * t, rtol=0.0, atol=1e-12)
+    assert np.allclose(z, 0.5 * a0 * t**2, rtol=0.0, atol=1e-12)
