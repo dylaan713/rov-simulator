@@ -126,10 +126,11 @@ from rovsim.sim.integrate import integrate, rk4_step
 
 
 def test_single_step_matches_exponential_decay():
-    # dy/dt = -y, y(0) = 1 -> y(h) = exp(-h). RK4 local error is O(h^5).
+    # dy/dt = -y, y(0) = 1 -> y(h) = exp(-h). RK4 local error is O(h^5):
+    # exactly h^5/120 = 8.3e-8 here, so 2e-7 leaves margin without going slack.
     h = 0.1
     y = rk4_step(lambda t, y: -y, 0.0, np.array([1.0]), h)
-    assert y[0] == pytest.approx(np.exp(-h), abs=1e-7)
+    assert y[0] == pytest.approx(np.exp(-h), abs=2e-7)
 
 
 def test_fourth_order_convergence():
