@@ -96,3 +96,49 @@ def derivative(body: VerticalBody) -> Callable[[float, np.ndarray], np.ndarray]:
         return np.array([w, heave_acceleration(body, w)])
 
     return f
+
+
+def terminal_velocity(body: VerticalBody) -> float:
+    """Terminal heave velocity in m/s, positive downward (z positive down).
+
+    At terminal velocity the acceleration is zero, so the net static force F
+    balances drag: F = k * w_t * |w_t| with k = 0.5 * rho * Cd * A.
+    Hence w_t = sign(F) * sqrt(|F| / k).
+
+    Degenerate cases: no drag (Cd * A == 0) never stops accelerating, so the
+    result is +inf or -inf by the sign of F; F == 0 (neutral buoyancy) gives 0.0.
+    """
+    force = net_static_force(body)
+    if force == 0.0:
+        return 0.0
+    k = 0.5 * body.fluid_density * body.drag_coefficient * body.reference_area
+    if k == 0.0:
+        return float(np.copysign(np.inf, force))
+    return float(np.copysign(np.sqrt(abs(force) / k), force))
+
+
+def analytic_heave(
+    body: VerticalBody, t: np.ndarray
+) -> tuple[np.ndarray, np.ndarray]:
+    """Exact (z, w) at times t for release from rest at z = 0.
+
+    With a0 = F / m and terminal velocity w_t, the equation
+    m * w_dot = F - k * w * |w| integrates to
+        w(t) = w_t * tanh(a0 * t / w_t)
+        z(t) = (w_t**2 / a0) * ln(cosh(a0 * t / w_t)),
+    and dz/dt = (w_t**2 / a0) * (a0 / w_t) * tanh(...) = w(t), so the pair closes.
+
+    Degenerate cases: F == 0 returns zero arrays (the body never moves); with
+    no drag (w_t infinite) the limit is constant acceleration, w = a0*t and
+    z = 0.5*a0*t**2.
+    """
+    t = np.asarray(t, dtype=float)
+    force = net_static_force(body)
+    if force == 0.0:
+        return np.zeros_like(t), np.zeros_like(t)
+    a0 = force / body.mass
+    w_t = terminal_velocity(body)
+    if np.isinf(w_t):
+        return 0.5 * a0 * t**2, a0 * t
+    x = a0 * t / w_t
+    return (w_t**2 / a0) * np.log(np.cosh(x)), w_t * np.tanh(x)
