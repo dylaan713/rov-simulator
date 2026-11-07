@@ -2,7 +2,7 @@
 
 Date: 2026-11-05
 Status: Draft for approval
-Related: `~/Projects/Personal/_parked/rov-build` (hardware track, parked)
+Related: the hardware track, in a separate repository (parked)
 Requirements: "ROV Scope" (Google Doc, 2026-09-23) — R-1..R-24, C-1..C-2
 
 ## Intent

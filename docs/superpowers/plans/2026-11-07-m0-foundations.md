@@ -49,7 +49,7 @@ Five conditions the design implies, that a reasonable person will hit, and that 
 - [ ] **Step 1: Initialise the repository**
 
 ```bash
-cd "/Users/dylanwollet/Projects/Personal/Fun projects/ROV simulator"
+cd /path/to/rov-simulator
 git init -b main
 ```
 
@@ -223,7 +223,7 @@ The reference body used by every test in Tasks 3–5, chosen so the arithmetic c
 
 These are **not** Approach A's real numbers and the docstring must say so.
 
-**Deviation from the design, recorded deliberately.** The design's traceability table says M0 "produces the drag model the hardware track needs for `pc1`". This plan does not, for three reasons: no CAD or hull geometry exists to derive a coefficient from; `pc1` needs a design speed that is still TBD (it was to be set at the PDR, which was missed); and `pc1` is Dylan's own calc under the mentor-only agreement that the software design explicitly leaves in force for the hardware track. M0 therefore validates the *model and the integrator* against a closed form using a declared placeholder body. The Approach-A coefficient derivation moves to M2, where the hull geometry it needs will exist. This goes in `docs/decisions.md` in Task 5.
+**Deviation from the design, recorded deliberately.** The design's traceability table says M0 "produces the drag model the hardware track needs for `pc1`". This plan does not, for three reasons: no CAD or hull geometry exists to derive a coefficient from; `pc1` needs a design speed that is still TBD (it was to be set at the PDR, which was missed); and `pc1` is the owner's own calc under the mentor-only agreement that the software design explicitly leaves in force for the hardware track. M0 therefore validates the *model and the integrator* against a closed form using a declared placeholder body. The Approach-A coefficient derivation moves to M2, where the hull geometry it needs will exist. This goes in `docs/decisions.md` in Task 5.
 
 - [ ] **Step 1: Write the failing tests**
 
