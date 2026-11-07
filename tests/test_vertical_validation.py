@@ -34,8 +34,8 @@ def test_simulated_trajectory_matches_closed_form_everywhere():
     f = derivative(REFERENCE)
     times, states = integrate(f, np.array([0.0, 0.0]), (0.0, 5.0), 1e-3)
     z_exact, w_exact = analytic_heave(REFERENCE, times)
-    assert np.max(np.abs(states[:, 1] - w_exact)) < 1e-6
-    assert np.max(np.abs(states[:, 0] - z_exact)) < 1e-6
+    assert np.max(np.abs(states[:, 1] - w_exact)) < 1e-9
+    assert np.max(np.abs(states[:, 0] - z_exact)) < 1e-9
 
 
 def test_step_size_controls_accuracy():
@@ -50,10 +50,11 @@ def test_step_size_controls_accuracy():
     errors = [error(h) for h in (0.1, 0.05, 0.025)]
     assert errors[0] > errors[1] > errors[2]
     assert errors[2] < 1e-6
-    # RK4 is fourth order: halving h cuts the error by 2**4 = 16. Requiring
-    # > 8 leaves margin but excludes an order-3 method (ratio 8 or less).
-    assert errors[0] / errors[1] > 8.0
-    assert errors[1] / errors[2] > 8.0
+    # RK4 is fourth order: halving h cuts the error by 2**4 = 16. Measured
+    # ratios are about 17 and 18; requiring > 14 leaves ~20% margin below that
+    # and excludes an order-3 method (ratio near 8) decisively, not marginally.
+    assert errors[0] / errors[1] > 14.0
+    assert errors[1] / errors[2] > 14.0
 
 
 def test_buoyant_body_rises_to_negative_terminal_velocity():

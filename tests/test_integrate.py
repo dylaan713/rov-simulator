@@ -1,4 +1,3 @@
-# tests/test_integrate.py
 import numpy as np
 import pytest
 from rovsim.sim.integrate import integrate, rk4_step

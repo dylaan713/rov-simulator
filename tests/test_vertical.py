@@ -1,4 +1,5 @@
-# tests/test_vertical.py
+import dataclasses
+
 import numpy as np
 import pytest
 from rovsim.sim.vertical import (
@@ -99,3 +100,8 @@ def test_unphysical_parameters_are_rejected(field, value):
     kwargs[field] = value
     with pytest.raises(ValueError):
         VerticalBody(**kwargs)
+
+
+def test_body_is_immutable():
+    with pytest.raises(dataclasses.FrozenInstanceError):
+        REFERENCE.mass = 1.0

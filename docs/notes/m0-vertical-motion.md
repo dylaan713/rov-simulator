@@ -2,7 +2,7 @@
 
 Milestone M0 of the [ROV simulator design](../superpowers/specs/2026-11-05-rov-simulator-design.md). Code: `src/rovsim/sim/vertical.py` and `src/rovsim/sim/integrate.py`. Figure and numbers reproduced by `scripts/plot_m0.py`.
 
-**What this note claims.** A hand-written RK4 integrator, applied to a one-degree-of-freedom heave model, reproduces the hand-calculated terminal velocity and the exact closed-form transient to better than 1 part in 10^9, and its error falls with step size at the rate fourth-order theory predicts. **What it does not claim.** The body used throughout (10 kg, 8 L, Cd = 1.0, A = 0.05 m^2) is a declared placeholder chosen so the arithmetic can be done by hand. It is not Approach A's geometry, and nothing here predicts how the real vehicle behaves. M0 validates the model and the integrator, not the vehicle.
+**What this note claims.** A hand-written RK4 integrator, applied to a one-degree-of-freedom heave model, reproduces the exact closed-form transient to better than 1 part in 10^9, and the hand-calculated terminal velocity to the six figures that value was quoted to. Its error also falls with step size at the rate fourth-order theory predicts. **What it does not claim.** The body used throughout (10 kg, 8 L, Cd = 1.0, A = 0.05 m^2) is a declared placeholder chosen so the arithmetic can be done by hand. It is not Approach A's geometry, and nothing here predicts how the real vehicle behaves. M0 validates the model and the integrator, not the vehicle.
 
 ## 1. What is being modelled
 
@@ -76,7 +76,7 @@ Three independent checks, each against something other than the code under test.
 2. **Whole-trajectory comparison against the exact solution.** The RK4 trajectory from rest is compared with the `tanh` and `ln cosh` expressions at every step. This tests the transient, not just the end state.
 3. **Step-size convergence.** If the integrator is fourth-order, halving h should cut the error by about 2^4 = 16. The maximum velocity error over the 5 s run was measured at h = 0.1, 0.05 and 0.025 s.
 
-The integrator itself is a hand-written classical RK4 with fixed step, deliberately not `scipy.integrate.solve_ivp`: a fixed step is what makes check 3 meaningful, whereas an adaptive solver chooses and hides its own step. The four stages evaluate the derivative at t, t + h/2, t + h/2 and t + h with weights (1, 2, 2, 1)/6. A dedicated test integrates `dy/dt = t^3` over [0, 1], which RK4 solves exactly because its weights reduce to Simpson's rule; the answer must be 0.25 to about 1e-12, and that test fails on the `k2` and `k4` stage-time mutations that were tried. The suite is 39 tests and runs clean under `pytest -W error`.
+The integrator itself is a hand-written classical RK4 with fixed step, deliberately not `scipy.integrate.solve_ivp`: a fixed step is what makes check 3 meaningful, whereas an adaptive solver chooses and hides its own step. The four stages evaluate the derivative at t, t + h/2, t + h/2 and t + h with weights (1, 2, 2, 1)/6. A dedicated test integrates `dy/dt = t^3` over [0, 1], which RK4 solves exactly because its weights reduce to Simpson's rule; the answer must be 0.25 to about 1e-12, and that test fails on the `k2` and `k4` stage-time mutations that were tried. The suite is 40 tests and runs clean under `pytest -W error`.
 
 ## 5. Figure
 

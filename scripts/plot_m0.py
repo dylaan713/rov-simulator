@@ -48,6 +48,9 @@ def max_w_error(body: VerticalBody, h: float) -> float:
 def main() -> None:
     body = VerticalBody(mass=10.0, volume=8.0e-3, drag_coefficient=1.0, reference_area=0.05)
 
+    assert abs(terminal_velocity(body) - HAND_CALCULATED_TERMINAL_VELOCITY) \
+        / HAND_CALCULATED_TERMINAL_VELOCITY < 1e-5, "script body has drifted from the validated body"
+
     times, states = integrate(derivative(body), np.array([0.0, 0.0]), (0.0, T_END), STEP)
     w_sim = states[:, 1]
     _, w_exact = analytic_heave(body, times)
@@ -58,8 +61,8 @@ def main() -> None:
             label="closed form: $w_t \\tanh(a_0 t / w_t)$")
     ax.plot(times, w_sim, color="tab:red", linewidth=1.2, linestyle=":",
             label=f"RK4 simulation, h = {STEP:g} s")
-    ax.axhline(w_terminal, color="black", linestyle="--", linewidth=1.0,
-               label=f"hand-calculated terminal velocity, {w_terminal:.6f} m/s")
+    ax.axhline(HAND_CALCULATED_TERMINAL_VELOCITY, color="black", linestyle="--", linewidth=1.0,
+               label=f"hand-calculated terminal velocity, {HAND_CALCULATED_TERMINAL_VELOCITY:.6f} m/s")
     ax.set_xlabel("time t (s)")
     ax.set_ylabel("heave velocity w (m/s, positive down)")
     ax.set_title("Reference body released from rest: approach to terminal velocity")

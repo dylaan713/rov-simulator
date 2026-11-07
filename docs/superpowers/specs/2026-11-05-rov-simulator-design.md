@@ -152,7 +152,7 @@ same calculation the hardware track needs for `pc1`.
 
 | Milestone | Requirements served |
 | --- | --- |
-| M0 Foundations | none directly; teaches integration, and produces the drag model the hardware track needs for `pc1` |
+| M0 Foundations | none directly; teaches integration, and produces the drag model the hardware track needs for `pc1` (deferred to M2 — see docs/decisions.md) |
 | M1 Thrusters and allocation | R-3 |
 | M2 Six degrees of freedom | R-1, R-17 (analytically) |
 | M3 Vehicle loop, sensors, failsafe | R-8, R-15, R-19 behaviour |
