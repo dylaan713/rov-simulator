@@ -266,9 +266,10 @@ def test_neutrally_buoyant_body_is_in_equilibrium_at_rest():
 
 
 def test_drag_opposes_motion_in_both_directions():
-    # 0.5 * 1000 * 1.0 * 0.05 * 2**2 = 50 N, opposing
-    assert drag_force(REFERENCE, 2.0) == pytest.approx(-50.0, abs=1e-9)
-    assert drag_force(REFERENCE, -2.0) == pytest.approx(50.0, abs=1e-9)
+    # k = 0.5 * rho * Cd * A = 0.5 * 1000 * 1.0 * 0.05 = 25.0 N s^2/m^2
+    # At w = 2 m/s: 25.0 * 2**2 = 100 N, opposing the motion.
+    assert drag_force(REFERENCE, 2.0) == pytest.approx(-100.0, abs=1e-9)
+    assert drag_force(REFERENCE, -2.0) == pytest.approx(100.0, abs=1e-9)
     assert drag_force(REFERENCE, 0.0) == 0.0
 
 
@@ -354,7 +355,7 @@ The hand calculation this task exists to confirm, done once, by hand, with the r
 F_net = (10.0 - 1000.0 * 0.008) * 9.80665      =  19.6133 N  (down)
 k     = 0.5 * 1000.0 * 1.0 * 0.05              =  25.0  N s^2/m^2
 w_t   = sqrt(F_net / k) = sqrt(0.784532)       =  0.885738 m/s
-tau   = m * w_t / F_net = 10 * 0.885738/19.6133 = 0.45157 s   (so 5 s is ~11 tau)
+tau   = m * w_t / F_net = 10 * 0.885738/19.6133 = 0.451601 s (so 5 s is ~11 tau)
 ```
 
 - [ ] **Step 1: Write the failing validation tests**
