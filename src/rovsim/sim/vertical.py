@@ -111,6 +111,7 @@ def terminal_velocity(body: VerticalBody) -> float:
     force = net_static_force(body)
     if force == 0.0:
         return 0.0
+    # Same constant as in drag_force; keep the two in step if the drag model changes.
     k = 0.5 * body.fluid_density * body.drag_coefficient * body.reference_area
     if k == 0.0:
         return float(np.copysign(np.inf, force))
@@ -143,4 +144,5 @@ def analytic_heave(
     if np.isinf(w_t):
         return 0.5 * a0 * t**2, a0 * t
     x = a0 * t / w_t
-    return (w_t**2 / a0) * np.log(np.cosh(x)), w_t * np.tanh(x)
+    # ln(cosh x) = logaddexp(x, -x) - ln 2, which does not overflow for large |x|.
+    return (w_t**2 / a0) * (np.logaddexp(x, -x) - np.log(2.0)), w_t * np.tanh(x)

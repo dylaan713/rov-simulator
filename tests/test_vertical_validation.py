@@ -1,4 +1,3 @@
-# tests/test_vertical_validation.py
 import numpy as np
 import pytest
 from rovsim.sim.integrate import integrate
@@ -51,6 +50,10 @@ def test_step_size_controls_accuracy():
     errors = [error(h) for h in (0.1, 0.05, 0.025)]
     assert errors[0] > errors[1] > errors[2]
     assert errors[2] < 1e-6
+    # RK4 is fourth order: halving h cuts the error by 2**4 = 16. Requiring
+    # > 8 leaves margin but excludes an order-3 method (ratio 8 or less).
+    assert errors[0] / errors[1] > 8.0
+    assert errors[1] / errors[2] > 8.0
 
 
 def test_buoyant_body_rises_to_negative_terminal_velocity():
@@ -59,6 +62,8 @@ def test_buoyant_body_rises_to_negative_terminal_velocity():
     )
     w_t = terminal_velocity(light)
     assert w_t < 0.0
+    # Same |F| and k as REFERENCE, so the hand value applies with a minus sign.
+    assert w_t == pytest.approx(-HAND_CALCULATED_TERMINAL_VELOCITY, rel=1e-5)
     _, states = integrate(derivative(light), np.array([0.0, 0.0]), (0.0, 5.0), 1e-3)
     assert states[-1, 1] == pytest.approx(w_t, rel=1e-3)
     assert states[-1, 0] < 0.0  # shallower than it started
@@ -77,7 +82,7 @@ def test_body_released_above_terminal_speed_decelerates_to_it():
 
 
 def test_zero_drag_gives_infinite_terminal_velocity():
-    # Review Focus 5.
+    # degenerate case: zero drag
     dragless = VerticalBody(
         mass=10.0, volume=8.0e-3, drag_coefficient=0.0, reference_area=0.05
     )
@@ -85,7 +90,7 @@ def test_zero_drag_gives_infinite_terminal_velocity():
 
 
 def test_neutrally_buoyant_closed_form_is_zero_not_nan():
-    # Review Focus 5.
+    # degenerate case: neutral buoyancy
     neutral = VerticalBody(
         mass=8.0, volume=8.0e-3, drag_coefficient=1.0, reference_area=0.05
     )
@@ -103,6 +108,14 @@ def test_zero_drag_gives_constant_acceleration_motion():
     )
     a0 = net_static_force(dragless) / dragless.mass  # 1.96133 m/s**2
     t = np.array([0.0, 1.0, 2.0, 3.0])
+    assert a0 == pytest.approx(1.96133, rel=1e-5)
     z, w = analytic_heave(dragless, t)
     assert np.allclose(w, a0 * t, rtol=0.0, atol=1e-12)
     assert np.allclose(z, 0.5 * a0 * t**2, rtol=0.0, atol=1e-12)
+
+
+def test_closed_form_stays_finite_at_large_time():
+    # ln(cosh x) overflows for x > ~710 (t > ~320 s here); the closed form must not.
+    z, w = analytic_heave(REFERENCE, np.array([1000.0]))
+    assert np.all(np.isfinite(z)) and np.all(np.isfinite(w))
+    assert w[0] == pytest.approx(HAND_CALCULATED_TERMINAL_VELOCITY, rel=1e-5)
