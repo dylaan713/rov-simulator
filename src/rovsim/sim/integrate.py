@@ -39,13 +39,20 @@ def integrate(
     is the initial condition. The last step is shortened if needed so the
     final sample lands exactly on t_span[1].
 
-    Raises ValueError if h is not a positive finite number, or if the state
-    becomes NaN or infinite (the solution has diverged).
+    Raises ValueError if h is not a positive finite number, if t_end is before
+    t_start, or if the state becomes NaN or infinite (the solution has diverged).
+
+    Note: the divergence check looks at the state after each full step, not at
+    the intermediate slopes k1..k4. Overflow warnings inside a step are
+    silenced, so an infinity absorbed mid-step (e.g. 1/inf) could in principle
+    give a finite final state that the check does not catch.
     """
     if not (math.isfinite(h) and h > 0):
         raise ValueError(f"step size h must be positive and finite, got {h}")
 
     t_start, t_end = t_span
+    if t_end < t_start:
+        raise ValueError(f"t_end must not be before t_start, got t_span = {t_span}")
     y = np.asarray(y0, dtype=float)
 
     # Number of steps; the small tolerance stops float noise (e.g. 10.000000001)
