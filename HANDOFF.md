@@ -2,7 +2,7 @@
 Last updated 2026-11-07.
 
 ## State Update
-- **Done:** M0 complete (2026-11-07, branch `m0-foundations`). Hand-written RK4 and 1-DOF vertical model; simulated terminal velocity 0.8857381099 m/s vs closed form 0.8857381103 m/s, relative error 4.8e-10; step-size study confirms 4th order. 39 tests pass under `pytest -W error`. Note: `docs/notes/m0-vertical-motion.md`; logs: `docs/decisions.md`, `docs/ai-assistance-log.md`.
+- **Done:** M0 complete (2026-11-07, branch `m0-foundations`). Hand-written RK4 and 1-DOF vertical model; simulated terminal velocity 0.8857381099 m/s vs closed form 0.8857381103 m/s, its 4.83e-10 distance from terminal velocity is the physical transient (predicted by 2exp(-2t/tau)), and the integrator's max deviation from the closed-form trajectory is 3.1e-13 m/s; step-size study confirms 4th order. 39 tests pass under `pytest -W error`. Note: `docs/notes/m0-vertical-motion.md`; logs: `docs/decisions.md`, `docs/ai-assistance-log.md`.
 - **Next step:** M1 — thruster model, 3-thruster configuration matrix and pilot mixing.
 
 ## Context a new session needs

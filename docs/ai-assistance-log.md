@@ -19,4 +19,4 @@ The assistant's substance was right first time. The RK4 coefficients, the force 
 
 None of the six failures was caught by a test passing or failing. They were caught by independent hand calculation, by deliberately breaking working code to see whether the tests noticed (the 9 of 10 and 11 of 12 passes under a broken integrator are the clearest example), and by a reader asking what the function does outside the range anyone tried.
 
-That is the concrete finding so far on the limits of AI-assisted development: the assistance is strong at producing plausible, usually-correct work, and weak at knowing what it has failed to check. A green test suite written by the same assistant that wrote the code is weak evidence. The checks that mattered were independent of it.
+That is the concrete finding so far on the limits of AI-assisted development: the assistance is strong at producing plausible, usually-correct work, and weak at knowing what it has failed to check. Author's conclusion, not part of the recorded findings: a green test suite written by the same assistant that wrote the code is weak evidence. the checks that mattered were independent of it.

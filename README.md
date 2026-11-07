@@ -21,6 +21,6 @@ python3.12 -m venv .venv
 
 | Quantity | Predicted (closed form) | Simulated | Error | Note |
 |---|---|---|---|---|
-| Terminal heave velocity, reference body | 0.8857381103 m/s | 0.8857381099 m/s (RK4, h = 1e-3 s, t = 5 s) | 4.8e-10 relative | Hand calculation: 0.885738 m/s. Reference body is a declared placeholder, not Approach A's geometry. |
+| Terminal heave velocity, reference body | 0.8857381103 m/s | 0.8857381099 m/s (RK4, h = 1e-3 s, t = 5 s) | 4.83e-10 relative to the asymptote (transient residual, 2exp(-2t/tau)); integrator error vs closed-form trajectory 3.1e-13 m/s max | Hand calculation: 0.885738 m/s. Reference body is a declared placeholder, not Approach A's geometry. |
 
 Method, derivations and the step-size study: [docs/notes/m0-vertical-motion.md](docs/notes/m0-vertical-motion.md). Decisions: [docs/decisions.md](docs/decisions.md). Where the AI assistant got things wrong: [docs/ai-assistance-log.md](docs/ai-assistance-log.md).

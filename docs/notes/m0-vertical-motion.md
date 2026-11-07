@@ -53,7 +53,7 @@ Integrating once more, using the identity integral tanh(u) du = ln cosh(u):
 
     z(t) = (w_t^2 / a0) * ln cosh(a0 * t / w_t)
 
-Check: dz/dt = (w_t^2/a0) * (a0/w_t) * tanh(a0 t / w_t) = w_t * tanh(a0 t / w_t) = w(t), so the pair closes. Initial conditions z(0) = w(0) = 0 hold. The time constant is `tau = w_t / a0 = m * w_t / F`, which is 0.451601 s for the reference body, so a 5 s run is about 11 tau (11.1) and the velocity has settled to within the integrator's error.
+Check: dz/dt = (w_t^2/a0) * (a0/w_t) * tanh(a0 t / w_t) = w_t * tanh(a0 t / w_t) = w(t), so the pair closes. Initial conditions z(0) = w(0) = 0 hold. The time constant is `tau = w_t / a0 = m * w_t / F`, which is 0.451601 s for the reference body, so a 5 s run is about 11 tau (11.1) and the velocity is within about 5e-10 (relative) of terminal velocity at the end of the run. That residual is the transient itself, not numerical error; see section 6.
 
 One implementation detail matters for anyone reusing the closed form. `cosh` overflows a double for arguments above about 710, so evaluating `ln cosh x` literally returns `inf` beyond roughly 320 s on this body. The code uses the algebraically identical `ln cosh x = logaddexp(x, -x) - ln 2`, which stays finite for any x. The two agree to 1.8e-15 over the range tested, so none of the numbers below depend on the choice. (This bug was found by a reviewer, not by a test; see the [AI-assistance log](../ai-assistance-log.md), entry 3.)
 
@@ -74,9 +74,9 @@ Three independent checks, each against something other than the code under test.
 
 1. **Terminal velocity against a hand calculation.** The value in section 2, worked on paper from the force balance, is compared with the closed-form function and with the simulated velocity at the end of the run.
 2. **Whole-trajectory comparison against the exact solution.** The RK4 trajectory from rest is compared with the `tanh` and `ln cosh` expressions at every step. This tests the transient, not just the end state.
-3. **Step-size convergence.** If the integrator is fourth-order, halving h should cut the error by about 2^4 = 16. The error at t = 5 s was measured at h = 0.1, 0.05 and 0.025 s.
+3. **Step-size convergence.** If the integrator is fourth-order, halving h should cut the error by about 2^4 = 16. The maximum velocity error over the 5 s run was measured at h = 0.1, 0.05 and 0.025 s.
 
-The integrator itself is a hand-written classical RK4 with fixed step, deliberately not `scipy.integrate.solve_ivp`: a fixed step is what makes check 3 meaningful, whereas an adaptive solver chooses and hides its own step. The four stages evaluate the derivative at t, t + h/2, t + h/2 and t + h with weights (1, 2, 2, 1)/6. A dedicated test integrates `dy/dt = t^3` over [0, 1], which RK4 solves exactly because its weights reduce to Simpson's rule; the answer must be 0.25 to about 1e-12, and that test fails if any stage time is wrong. The suite is 39 tests and runs clean under `pytest -W error`.
+The integrator itself is a hand-written classical RK4 with fixed step, deliberately not `scipy.integrate.solve_ivp`: a fixed step is what makes check 3 meaningful, whereas an adaptive solver chooses and hides its own step. The four stages evaluate the derivative at t, t + h/2, t + h/2 and t + h with weights (1, 2, 2, 1)/6. A dedicated test integrates `dy/dt = t^3` over [0, 1], which RK4 solves exactly because its weights reduce to Simpson's rule; the answer must be 0.25 to about 1e-12, and that test fails on the `k2` and `k4` stage-time mutations that were tried. The suite is 39 tests and runs clean under `pytest -W error`.
 
 ## 5. Figure
 
@@ -97,13 +97,23 @@ Reference body, fresh water, release from rest, RK4 with h = 1e-3 s, run to t = 
 | Terminal velocity, hand-calculated | 0.885738 m/s |
 | Terminal velocity, closed form | 0.8857381103 m/s |
 | Simulated w at t = 5 s | 0.8857381099 m/s |
-| Relative error, simulated vs closed form | 4.8e-10 |
+| Distance from terminal velocity at t = 5 s (relative) | 4.83e-10 |
 | Relative error, simulated vs hand calculation | 1.24e-7 |
 | Max deviation of trajectory from closed form | 1.2e-13 m in z, 3.1e-13 m/s in w |
 | Depth at t = 5 s | 4.151432 m |
 | Time constant tau | 0.451601 s |
 
-The simulator agrees with the closed form to 4.8e-10. The larger 1.24e-7 against the hand calculation is an artefact of how precisely the hand value was written down, not a modelling error: the closed form is 0.885738110..., and rounding it to the six figures of the hand calculation (0.885738) alone accounts for a relative difference of 1.24e-7. It contains no simulator error. It is the difference between a model that is slightly off and a target number quoted to six digits.
+Three different quantities are easy to conflate here, and they are not the same thing:
+
+| Quantity | Value | What it is |
+|---|---|---|
+| Distance from w_t at t = 5 s | 4.83e-10 | The physical transient. The body is still approaching terminal velocity. The closed form alone, with no integrator involved, sits exactly this far from w_t. |
+| Max deviation of simulation from the closed form | 3.1e-13 m/s (1.2e-13 m in z) | The integrator's error over the whole run. At the final point it is 3.8e-16 relative to w_t. |
+| Error vs the hand-calculated value | 1.24e-7 | Rounding of the hand figure to six significant digits. |
+
+The first is predicted analytically: the distance from w_t is `1 - tanh(t/tau) = 2 exp(-2t/tau)` to leading order, which at t = 5 s (11.1 tau) is 4.83e-10, matching the printed value to every digit shown. That agreement is a second, independent confirmation that the transient is right. The integrator is therefore about 1400 times more accurate than the 4.83e-10 residual, and the claim that the simulation matches theory to better than 1 part in 10^9 holds with room to spare.
+
+The 1.24e-7 against the hand calculation is not a modelling error: the closed form is 0.885738110..., and rounding it to the six figures of the hand calculation (0.885738) alone accounts for a relative difference of 1.24e-7. It contains no simulator error. It is the difference between a model that is slightly off and a target number quoted to six digits.
 
 Every number in this section is printed by `scripts/plot_m0.py`.
 

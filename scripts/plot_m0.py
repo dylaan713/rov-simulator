@@ -7,6 +7,7 @@ closed form, and saves the figure under docs/notes/figures/.
 Run from anywhere: .venv/bin/python scripts/plot_m0.py
 """
 
+import math
 from pathlib import Path
 
 import matplotlib
@@ -73,7 +74,11 @@ def main() -> None:
     plt.close(fig)
 
     w_final = float(w_sim[-1])
-    rel_closed = abs(w_final - w_terminal) / abs(w_terminal)
+    # Distance from the asymptote w_t: the closed form alone sits this far away
+    # at t = 5 s, so this is the physical transient, not integrator error.
+    residual = abs(w_final - w_terminal) / abs(w_terminal)
+    residual_predicted = 2.0 * math.exp(-2.0 * T_END / (body.mass * w_terminal / net_static_force(body)))
+    integrator_error_final = abs(w_final - float(w_exact[-1])) / abs(w_terminal)
     rel_hand = abs(w_final - HAND_CALCULATED_TERMINAL_VELOCITY) / HAND_CALCULATED_TERMINAL_VELOCITY
     force = net_static_force(body)
     k = 0.5 * body.fluid_density * body.drag_coefficient * body.reference_area
@@ -88,7 +93,9 @@ def main() -> None:
     print(f"Hand-calculated terminal velocity:         {HAND_CALCULATED_TERMINAL_VELOCITY} m/s")
     print(f"Predicted terminal velocity (closed form): {w_terminal:.10f} m/s")
     print(f"Simulated w at t = {T_END:g} s:               {w_final:.10f} m/s")
-    print(f"Relative error vs closed form:             {rel_closed:.2e}")
+    print(f"Distance from terminal velocity at t = {T_END:g} s:  {residual:.2e} (transient residual, relative)")
+    print(f"  predicted analytically, 2*exp(-2t/tau):  {residual_predicted:.2e}")
+    print(f"Integrator error at t = {T_END:g} s vs closed form: {integrator_error_final:.1e} (relative to w_t)")
     print(f"Relative error vs hand calculation:        {rel_hand:.2e}")
     print(f"Time constant tau = m*w_t/F:               {tau:.6f} s ({T_END / tau:.1f} tau in {T_END:g} s)")
     print(f"Depth at t = {T_END:g} s:                      {states[-1, 0]:.6f} m")
