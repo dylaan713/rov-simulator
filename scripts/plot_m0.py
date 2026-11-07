@@ -100,6 +100,10 @@ def main() -> None:
     print(f"Time constant tau = m*w_t/F:               {tau:.6f} s ({T_END / tau:.1f} tau in {T_END:g} s)")
     print(f"Depth at t = {T_END:g} s:                      {states[-1, 0]:.6f} m")
     print(f"Max trajectory deviation from closed form: {dev_z:.1e} m in z, {dev_w:.1e} m/s in w")
+    dev_w_rel = dev_w / abs(w_terminal)
+    print(f"  max w deviation, relative to w_t:        {dev_w_rel:.1e}")
+    print(f"Residual / max integrator error:           {residual / dev_w_rel:.0f}x (run maximum, matched units)")
+    print(f"Residual / final-point integrator error:   {residual / integrator_error_final:.1e}x")
     print("Step-size study (max |w error| over the run):")
     for i, (h, e) in enumerate(zip(STUDY_STEPS, errors)):
         ratio = f"  ratio {errors[i - 1] / e:.1f}" if i else ""

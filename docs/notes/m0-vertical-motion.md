@@ -108,14 +108,14 @@ Three different quantities are easy to conflate here, and they are not the same 
 | Quantity | Value | What it is |
 |---|---|---|
 | Distance from w_t at t = 5 s | 4.83e-10 | The physical transient. The body is still approaching terminal velocity. The closed form alone, with no integrator involved, sits exactly this far from w_t. |
-| Max deviation of simulation from the closed form | 3.1e-13 m/s (1.2e-13 m in z) | The integrator's error over the whole run. At the final point it is 3.8e-16 relative to w_t. |
+| Max deviation of simulation from the closed form | 3.1e-13 m/s, or 3.5e-13 relative to w_t (1.2e-13 m in z) | The integrator's error over the whole run. At the final point it is 3.8e-16 relative to w_t. |
 | Error vs the hand-calculated value | 1.24e-7 | Rounding of the hand figure to six significant digits. |
 
-The first is predicted analytically: the distance from w_t is `1 - tanh(t/tau) = 2 exp(-2t/tau)` to leading order, which at t = 5 s (11.1 tau) is 4.83e-10, matching the printed value to every digit shown. That agreement is a second, independent confirmation that the transient is right. The integrator is therefore about 1400 times more accurate than the 4.83e-10 residual, and the claim that the simulation matches theory to better than 1 part in 10^9 holds with room to spare.
+The first is predicted analytically: the distance from w_t is `1 - tanh(t/tau) = 2 exp(-2t/tau)` to leading order, which at t = 5 s (11.1 tau) is 4.83e-10, matching the printed value to every digit shown. That agreement is a second, independent confirmation that the transient is right. In matched relative terms, the integrator's run-maximum error (3.5e-13) is about 1400 times smaller than the 4.83e-10 residual (the script prints 1372), and its final-point error (3.8e-16) is roughly a million times smaller, and the claim that the simulation matches theory to better than 1 part in 10^9 holds with room to spare.
 
 The 1.24e-7 against the hand calculation is not a modelling error: the closed form is 0.885738110..., and rounding it to the six figures of the hand calculation (0.885738) alone accounts for a relative difference of 1.24e-7. It contains no simulator error. It is the difference between a model that is slightly off and a target number quoted to six digits.
 
-Every number in this section is printed by `scripts/plot_m0.py`.
+Every measured number in this section, and the two ratios above, is printed by `scripts/plot_m0.py`.
 
 Step-size study, maximum |w error| over the 5 s run:
 
