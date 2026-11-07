@@ -464,10 +464,9 @@ Expected: `ImportError: cannot import name 'terminal_velocity'`.
 
 - [ ] **Step 3: Append `terminal_velocity` and `analytic_heave` to `src/rovsim/sim/vertical.py`**
 
-Use `np.logaddexp`-free plain `np.log(np.cosh(x))` only if it does not overflow at the largest `x` the tests reach (`a0*t/w_t` is about 11 at t = 5 s, so `cosh` is ~3e4 — safe).
+Use `np.logaddexp`-free plain `np.log(np.cosh(x))` only if it does not overflow at the largest `x` the tests reach (`a0*t/w_t` is about 11 at t = 5 s, so `cosh` is ~3e4 — safe). Guard the degenerate branches before any division. Both docstrings must contain the derivation in two lines, because the note in Task 5 quotes them.
 
-> **Superseded.** This instruction was wrong: it scopes safety to the range the tests reach, not to the function's domain, which is the overflow bug itself (`cosh` overflows above argument 710). The implemented replacement is `logaddexp(x, -x) - ln 2`; see `docs/decisions.md` and entry 3 of `docs/ai-assistance-log.md`. Kept unedited above as a historical record.
- Guard the degenerate branches before any division. Both docstrings must contain the derivation in two lines, because the note in Task 5 quotes them.
+> **Superseded — the first sentence only.** The instruction to use plain `np.log(np.cosh(x))` was wrong, and its reasoning was the error: it scopes safety to the range the tests happen to reach rather than to the function's domain, and `cosh` overflows above argument 710 (about t = 320 s for the reference body). The implemented replacement is `logaddexp(x, -x) - ln 2`; see `docs/decisions.md` and entry 3 of `docs/ai-assistance-log.md`. The step above is left exactly as written, as a historical record. The rest of the step still stands.
 
 - [ ] **Step 4: Run the whole suite**
 
