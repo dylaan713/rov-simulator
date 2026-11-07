@@ -53,7 +53,7 @@ Integrating once more, using the identity integral tanh(u) du = ln cosh(u):
 
     z(t) = (w_t^2 / a0) * ln cosh(a0 * t / w_t)
 
-Check: dz/dt = (w_t^2/a0) * (a0/w_t) * tanh(a0 t / w_t) = w_t * tanh(a0 t / w_t) = w(t), so the pair closes. Initial conditions z(0) = w(0) = 0 hold. The time constant is `tau = w_t / a0 = m * w_t / F`, which is 0.451601 s for the reference body, so a 5 s run is about 11 tau and the velocity has settled to within the integrator's error.
+Check: dz/dt = (w_t^2/a0) * (a0/w_t) * tanh(a0 t / w_t) = w_t * tanh(a0 t / w_t) = w(t), so the pair closes. Initial conditions z(0) = w(0) = 0 hold. The time constant is `tau = w_t / a0 = m * w_t / F`, which is 0.451601 s for the reference body, so a 5 s run is about 11 tau (11.1) and the velocity has settled to within the integrator's error.
 
 One implementation detail matters for anyone reusing the closed form. `cosh` overflows a double for arguments above about 710, so evaluating `ln cosh x` literally returns `inf` beyond roughly 320 s on this body. The code uses the algebraically identical `ln cosh x = logaddexp(x, -x) - ln 2`, which stays finite for any x. The two agree to 1.8e-15 over the range tested, so none of the numbers below depend on the choice. (This bug was found by a reviewer, not by a test; see the [AI-assistance log](../ai-assistance-log.md), entry 3.)
 
@@ -98,14 +98,16 @@ Reference body, fresh water, release from rest, RK4 with h = 1e-3 s, run to t = 
 | Terminal velocity, closed form | 0.8857381103 m/s |
 | Simulated w at t = 5 s | 0.8857381099 m/s |
 | Relative error, simulated vs closed form | 4.8e-10 |
-| Relative error, simulated vs hand calculation | 1.2e-7 |
+| Relative error, simulated vs hand calculation | 1.24e-7 |
 | Max deviation of trajectory from closed form | 1.2e-13 m in z, 3.1e-13 m/s in w |
 | Depth at t = 5 s | 4.151432 m |
 | Time constant tau | 0.451601 s |
 
-The 1.2e-7 against the hand calculation is the six-figure rounding of the hand value, not integrator error; the integrator agrees with the closed form to 4.8e-10.
+The simulator agrees with the closed form to 4.8e-10. The larger 1.24e-7 against the hand calculation is an artefact of how precisely the hand value was written down, not a modelling error: the closed form is 0.885738110..., and rounding it to the six figures of the hand calculation (0.885738) alone accounts for a relative difference of 1.24e-7. It contains no simulator error. It is the difference between a model that is slightly off and a target number quoted to six digits.
 
-Step-size study, error at t = 5 s:
+Every number in this section is printed by `scripts/plot_m0.py`.
+
+Step-size study, maximum |w error| over the 5 s run:
 
 | h (s) | Error | Ratio to previous |
 |---|---|---|
