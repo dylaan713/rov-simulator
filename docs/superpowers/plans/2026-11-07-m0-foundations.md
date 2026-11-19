@@ -223,7 +223,7 @@ The reference body used by every test in Tasks 3–5, chosen so the arithmetic c
 
 These are **not** Approach A's real numbers and the docstring must say so.
 
-**Deviation from the design, recorded deliberately.** The design's traceability table says M0 "produces the drag model the hardware track needs for `pc1`". This plan does not, for three reasons: no CAD or hull geometry exists to derive a coefficient from; `pc1` needs a design speed that is still TBD (it was to be set at the PDR, which was missed); and `pc1` is the owner's own calc under the mentor-only agreement that the software design explicitly leaves in force for the hardware track. M0 therefore validates the *model and the integrator* against a closed form using a declared placeholder body. The Approach-A coefficient derivation moves to M2, where the hull geometry it needs will exist. This goes in `docs/decisions.md` in Task 5.
+**Deviation from the design, recorded deliberately.** The design's traceability table says M0 "produces the drag model the hardware track needs for `pc1`". This plan does not, for three reasons: no CAD or hull geometry exists to derive a coefficient from; `pc1` needs a design speed that is still TBD; and `pc1` is the owner's own calc, part of the hardware track that the software design explicitly leaves with the owner. M0 therefore validates the *model and the integrator* against a closed form using a declared placeholder body. The Approach-A coefficient derivation moves to M2, where the hull geometry it needs will exist. This goes in `docs/decisions.md` in Task 5.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -537,6 +537,6 @@ git commit -m "docs: add M0 technical note, validation plot, decision and AI-ass
 
 ## Open items, not part of this plan
 
-- **Public GitHub repository.** The design assumes public from M0 and notes it is reversible in only one direction. `gh` is authenticated as `dylaan713`. No remote is created by this plan; it needs a separate yes.
+- **Public GitHub repository.** The design assumes public from M0 and notes it is reversible in only one direction. No remote is created by this plan; it needs a separate yes.
 - **Dependency install** (`numpy`, `scipy`, `matplotlib`, `pytest` into `.venv`) needs explicit approval before Task 1 Step 4 runs.
-- **Hours per week** is still unestablished, so this plan carries no dates.
+- **No dates.** Milestones are sized as testable units, so this plan carries no dates.

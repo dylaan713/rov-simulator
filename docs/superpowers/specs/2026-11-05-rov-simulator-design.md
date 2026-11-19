@@ -3,11 +3,11 @@
 Date: 2026-11-05
 Status: Draft for approval
 Related: the hardware track, in a separate repository (parked)
-Requirements: "ROV Scope" (Google Doc, 2026-09-23) — R-1..R-24, C-1..C-2
+Requirements: the project requirements document (not published) — R-1..R-24, C-1..C-2
 
 ## Intent
 
-Build the surface control software and vehicle control code that the ROV Scope
+Build the surface control software and vehicle control code that the project
 requirements already call for, and build a physics simulator that stands in for
 the vehicle so that software can be written and tested before any hardware
 exists.
@@ -27,39 +27,39 @@ for the real one and the ground station already works, already logs, and has
 already had its failsafe tested a thousand times in situations too dangerous to
 stage in a sinkhole.
 
-That is also why this is worth showing an employer. Developing vehicle software
-against a simulated plant, then swapping in hardware, is how real vehicle
-programs are run. It is a stronger story than either piece alone.
+That is also what makes it credible, verifiable engineering work. Developing
+vehicle software against a simulated plant, then swapping in hardware, is how
+real vehicle programs are run. It is a stronger story than either piece alone.
 
 ### Secondary intent
 
 Two things the owner stated directly:
 
-1. **Learn to build software properly.** He is a mechanical engineering
-   undergraduate with strong engineering fundamentals — statics, dynamics,
-   ODEs, applied statistics, MATLAB, one C++ course — and limited software
-   experience. He directs; the assistant explains as it goes. **Teaching is a
-   requirement of this project, not a courtesy.**
+1. **Understand the system that gets built.** The owner must be able to
+   explain, conceptually, how every part works and why each choice was made.
+   **Teaching is a requirement of this project, not a courtesy.**
 2. **Find the real limits of AI-assisted development.** The domain was chosen
    because it has a ground truth that cannot be bluffed. A web app rewards
    plausible-looking code because "it renders" feels like success. A dynamics
    model either matches a closed-form solution and a hand calculation or it
    does not.
 
-## Working agreement — changed 2026-11-05
+## How the software is built
 
-The parked hardware repo instructs the assistant to act as reviewer and mentor
-only, and never to write the owner's calcs, CAD or code. **For software work,
-that is superseded by the owner's decision on 2026-11-05: co-development, with
-the assistant teaching as it goes.** The mentor-only agreement still stands for
-the hardware track — calcs, CAD and fabrication decisions remain his.
+The simulator software is built by AI coding agents under the owner's
+direction: the owner sets direction, approves each spec and milestone, and
+makes the decisions that belong to the owner. Real vehicle parameters —
+calculations, CAD and fabrication decisions — come from the owner's hardware
+track and stay declared placeholders until supplied. See `docs/decisions.md`
+(2026-11-19).
 
 ## Goals
 
 - Deliver the software the requirements call for: R-3, R-9, R-10, R-14, R-15,
   R-16, R-20, and scope items 4 and 5.
 - A 6-DOF simulator faithful enough to develop and tune that software against.
-- The owner can read, explain and defend every part of the system.
+- The owner can explain, conceptually, every part of the system and why each
+  choice was made.
 - Documentation produced as the work happens, not retrofitted — see below.
 
 ## Non-goals
@@ -76,13 +76,10 @@ the hardware track — calcs, CAD and fabrication decisions remain his.
 
 Outcomes that would make this a failure even if the code runs:
 
-- **Code the owner cannot read or explain.** If he cannot defend a subsystem,
-  that subsystem has negative value against the employer goal.
+- **A system the owner cannot explain conceptually.** A subsystem nobody can
+  explain or defend is not credible engineering work, however well it runs.
 - **The simulator becoming the project** while the required ground station
   never gets built. The simulator is a means.
-- **The assistant writing everything while the owner watches.** That fails both
-  stated goals at once — it neither teaches nor reveals where AI assistance
-  actually breaks down.
 
 ## Constraints
 
@@ -96,9 +93,8 @@ Outcomes that would make this a failure even if the code runs:
   forward, backward, turn, rise and descend - there is deliberately no sway. The
   allocation layer must not silently command lateral force the vehicle cannot
   produce.
-- C-2: built, tested **and documented** by 2027-01-31.
-- Owner's available hours per week: not established. Milestones are sized as
-  testable units, not calendar estimates.
+- C-2: built, tested **and documented** by the project deadline.
+- Milestones are sized as testable units, not calendar estimates.
 
 ## Architecture - the decided parts
 
@@ -225,6 +221,8 @@ of each milestone's definition of done, not a phase at the end.
 
 ## Open questions
 
-- Should the GitHub repository be public from M0? Assumed yes, for the
-  employer goal. Reversible only in one direction.
-- Hours per week, to set a realistic pace.
+- Should the GitHub repository be public from M0? Assumed yes, so the work can be
+  checked in the open. Reversible only in one direction.
+- **Interactive teaching mode** (requested by the owner 2026-11-19): the
+  simulator built so any user can drive it and learn how it works. Scope,
+  audience and where it sits among M2–M5 to be decided after M1.
