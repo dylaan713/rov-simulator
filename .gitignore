@@ -8,3 +8,9 @@ build/
 dist/
 .superpowers/
 HANDOFF.md
+
+# Local Claude capability: useful here, not for the published repo.
+.claude/
+
+# Local agent notes: useful here, not for the published repo.
+CLAUDE.md
